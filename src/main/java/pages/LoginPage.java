@@ -1,42 +1,80 @@
 package pages;
-
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
 
 public class LoginPage {
     WebDriver driver;
 
-    // Locators
-    private By usernameField = By.id("user-name");
-    private By passwordField = By.id("password");
-    private By loginButton = By.id("login-button");
-    private By errorMessage = By.cssSelector("[data-test='error']");
-
-    // Constructor
     public LoginPage(WebDriver driver) {
         this.driver = driver;
+        PageFactory.initElements(driver, this);
     }
+
+    // WebElements
+    @FindBy(id = "user-name")
+    private WebElement usernameField;
+    @FindBy(id = "password")
+    private WebElement passwordField;
+    @FindBy(id = "login-button")
+    private WebElement loginButton;
+    @FindBy(css = "[data-test='error']")
+    private WebElement errorMessage;
+    @FindBy(xpath = "//h3[@data-test='error']")
+    private WebElement noLoginErrorMessage;
 
     // Actions
     public void enterUsername(String username) {
-        driver.findElement(usernameField).sendKeys(username);
+        try {
+            usernameField.sendKeys(username);
+        } catch (Exception e) {
+            System.out.println("Failed to enter username: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void enterPassword(String password) {
-        driver.findElement(passwordField).sendKeys(password);
+        try {
+            passwordField.sendKeys(password);
+        } catch (Exception e) {
+            System.out.println("Failed to enter password: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void clickLogin() {
-        driver.findElement(loginButton).click();
+        try {
+            loginButton.click();
+        } catch (Exception e) {
+            System.out.println("Failed to click login button: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void login(String username, String password) {
-        enterUsername(username);
-        enterPassword(password);
+        try {
+            enterUsername(username);
+            enterPassword(password);
+            clickLogin();
+        } catch (Exception e) {
+            System.out.println("Login failed: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    public String noLoginErrorMessage() {
+        return noLoginErrorMessage.getText();
+    }
 
-        clickLogin();
-    }
     public String getErrorMessage() {
-        return driver.findElement(errorMessage).getText();
+        try {
+            return errorMessage.getText();
+        } catch (Exception e) {
+            System.out.println("Failed to get error message: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
     }
-}
+
+    }
+

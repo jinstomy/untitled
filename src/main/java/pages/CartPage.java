@@ -1,55 +1,111 @@
 package pages;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
-
 public class CartPage {
     private WebDriver driver;
-    private WebDriverWait wait;
 
-
-    private By firstProd = By.xpath("//button[@id='add-to-cart-sauce-labs-backpack']");
-    private By secndProd = By.xpath("//button[@id='add-to-cart-sauce-labs-bike-light']");
-    private By shoppingCart =By.cssSelector("a[data-test='shopping-cart-link']");
-    //private By shoppingCart =By.id("shopping_cart_container");
-    private By checkOut= By.id("checkout");
-    private By fName = By.xpath("//input[@id='first-name']");
-    private By lName = By.xpath("//input[@id='last-name']");
-    private By pCode = By.xpath("//input[@id='postal-code']");
-    private By continueBtn =By.id("continue");
-    private By finish = By.id("finish");
-    private By thankYouMessage = By.xpath("//h2[text()='Thank you for your order!']");
-
+    // Constructor
     public CartPage(WebDriver driver) {
         this.driver = driver;
+        PageFactory.initElements(driver, this);
     }
-    //Action
+
+    // WebElements using @FindBy
+    @FindBy(id = "add-to-cart-sauce-labs-backpack")
+    private WebElement firstProd;
+
+    @FindBy(id = "add-to-cart-sauce-labs-bike-light")
+    private WebElement secondProd;
+
+    @FindBy(css = "a[data-test='shopping-cart-link']")
+    private WebElement shoppingCart;
+
+    @FindBy(id = "checkout")
+    private WebElement checkOut;
+
+    @FindBy(id = "first-name")
+    private WebElement fName;
+
+    @FindBy(id = "last-name")
+    private WebElement lName;
+
+    @FindBy(id = "postal-code")
+    private WebElement pCode;
+
+    @FindBy(id = "continue")
+    private WebElement continueBtn;
+
+    @FindBy(id = "finish")
+    private WebElement finishBtn;
+
+    @FindBy(xpath = "//h2[text()='Thank you for your order!']")
+    private WebElement thankYouMessage;
+
+    // Actions with try-catch
     public void addToCart() {
-        driver.findElement(firstProd).click();
-        driver.findElement(secndProd).click();
+        try {
+            firstProd.click();
+            secondProd.click();
+        } catch (Exception e) {
+            System.out.println("Failed to add products to cart: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
+
     public void checkout() {
+        try {
+            System.out.println("Clicking shopping cart icon...");
+            shoppingCart.click();
 
-        System.out.println("Waiting for shopping cart icon to be visible...");
-        driver.findElement(shoppingCart).click();
-        driver.findElement(checkOut).click();
+            // wait for the checkout button to be clickable
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+            wait.until(ExpectedConditions.elementToBeClickable(checkOut));
+
+            checkOut.click();
+        } catch (Exception e) {
+            System.out.println("Failed during checkout: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
-    public void checkoutInfo(String finame, String lsname, String pcode) {
-        driver.findElement(fName).sendKeys(finame);
-        driver.findElement(lName).sendKeys(lsname);
-        driver.findElement(pCode).sendKeys(pcode);
-        driver.findElement(continueBtn).click();
+
+    public void checkoutInfo(String finame, String lsname, String postalCode) {
+        try {
+            fName.sendKeys(finame);
+            lName.sendKeys(lsname);
+            pCode.sendKeys(postalCode);
+            continueBtn.click();
+        } catch (Exception e) {
+            System.out.println("Failed to enter checkout info: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
-    public void finish(){
-        driver.findElement(finish).click();
+
+    public void finish() {
+        try {
+            finishBtn.click();
+        } catch (Exception e) {
+            System.out.println("Failed to complete the order: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
+
     public boolean isThankYouMessageDisplayed() {
-        return driver.findElement(thankYouMessage).isDisplayed();
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            wait.until(ExpectedConditions.visibilityOf(thankYouMessage));
+            return thankYouMessage.isDisplayed();
+        } catch (Exception e) {
+            System.out.println("Thank you message not displayed: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
-
 }
-
